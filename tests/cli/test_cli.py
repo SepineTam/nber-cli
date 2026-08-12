@@ -38,6 +38,7 @@ from nber_cli.cli import (
     _print_doctor,
     _read_db_last_run,
     _resolve_paper_ids,
+    _run_mcp_server,
     main,
 )
 
@@ -1237,6 +1238,28 @@ class TestMainEntrypointInfoCache:
 
 
 class TestMainEntrypointMcpServer:
+    @pytest.mark.parametrize(
+        ("transport", "include_download"),
+        [
+            ("stdio", True),
+            ("sse", False),
+            ("streamable-http", False),
+        ],
+    )
+    @patch("nber_cli.mcp.create_mcp_server")
+    def test_mcp_server_selects_tools_for_transport(
+        self,
+        mock_create_server,
+        transport,
+        include_download,
+    ):
+        _run_mcp_server(transport, 9000)
+
+        mock_create_server.assert_called_once_with(include_download=include_download)
+        mock_server = mock_create_server.return_value
+        assert mock_server.settings.port == 9000
+        mock_server.run.assert_called_once_with(transport=transport)
+
     @patch("nber_cli.cli._run_mcp_server")
     def test_mcp_server_starts_with_default_transport(self, mock_run, capsys):
         with patch.object(sys, "argv", ["nber-cli", "mcp-server"]):

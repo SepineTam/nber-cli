@@ -65,7 +65,7 @@ uvx nber-cli mcp-server
 uv run nber-cli mcp-server --transport streamable-http --port 8000 --yes
 ```
 
-The first command uses the published package's default stdio server. The second uses the current source tree's Unreleased transport spelling; `--port` already exists in published `0.4.0`, while the source tree newly requires `--yes` for a custom value. The HTTP transport has no built-in authentication; do not expose it to an untrusted network.
+The first command uses the published package's default stdio server and includes the download tool. The second uses the current source tree's Unreleased transport spelling and exposes only search and paper-info tools; `--port` already exists in published `0.4.0`, while the source tree newly requires `--yes` for a custom value. The HTTP transport has no built-in authentication; do not expose it to an untrusted network.
 
 ## Examples Index
 

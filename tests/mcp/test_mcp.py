@@ -12,7 +12,35 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from nber_cli.mcp import _parse_paper_id, download_paper, get_paper_info, search_papers
+from nber_cli.mcp import (
+    _parse_paper_id,
+    create_mcp_server,
+    download_paper,
+    get_paper_info,
+    search_papers,
+)
+
+
+class TestMcpServerTools:
+    @pytest.mark.asyncio
+    async def test_stdio_profile_includes_download(self):
+        server = create_mcp_server(include_download=True)
+
+        tools = await server.list_tools()
+
+        assert {tool.name for tool in tools} == {
+            "download_paper",
+            "get_paper_info",
+            "search_papers",
+        }
+
+    @pytest.mark.asyncio
+    async def test_http_profile_excludes_download(self):
+        server = create_mcp_server(include_download=False)
+
+        tools = await server.list_tools()
+
+        assert {tool.name for tool in tools} == {"get_paper_info", "search_papers"}
 
 
 class TestParsePaperId:

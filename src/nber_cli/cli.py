@@ -486,9 +486,11 @@ def _handle_download_errors(batch_result: DownloadBatchResult, paper_ids: list[s
 
 
 def _run_mcp_server(transport: str, port: int) -> None:
-    from .mcp import nber_mcp
-    nber_mcp.settings.port = port
-    nber_mcp.run(transport=cast(Literal["stdio", "sse", "streamable-http"], transport))
+    from .mcp import create_mcp_server
+
+    mcp_server = create_mcp_server(include_download=transport == "stdio")
+    mcp_server.settings.port = port
+    mcp_server.run(transport=cast(Literal["stdio", "sse", "streamable-http"], transport))
 
 
 def _print_json(payload: dict) -> None:

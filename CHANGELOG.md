@@ -6,6 +6,10 @@ This file is the canonical release history. The English mirror at `docs/en/chang
 
 ## [Unreleased]
 
+### Changed
+
+- HTTP MCP transports now expose only paper search and paper info; the download tool remains available through the default stdio transport.
+
 ### Documentation
 
 - Reframed the project documentation around Desktop as the primary researcher interface, with CLI and MCP positioned as AI-agent and automation interfaces.

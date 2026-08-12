@@ -13,12 +13,10 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
 from ..db import db
+from ..db.info_cache import get_paper_with_info_cache
+from ..fetch.download import download_paper as download_paper_to_dir, download_paper_to_file
 from ..fetch.fetcher import search_nber
 from ..utils.formatters import info, related, search_results
-from ..fetch.download import download_paper as download_paper_to_dir, download_paper_to_file
-from ..db.info_cache import get_paper_with_info_cache
-
-nber_mcp = FastMCP("nber_mcp")
 
 
 _PAPER_ID_RE = re.compile(r"^w?\d+$", re.IGNORECASE)
@@ -31,7 +29,6 @@ def _parse_paper_id(paper_id_str: str) -> int:
     return int(cleaned)
 
 
-@nber_mcp.tool()
 async def get_paper_info(paper_id: str, include_all: bool = True) -> dict:
     """Fetch metadata and abstract for an NBER working paper by ID.
 
@@ -58,7 +55,6 @@ async def get_paper_info(paper_id: str, include_all: bool = True) -> dict:
     return result
 
 
-@nber_mcp.tool()
 async def search_papers(
     query: str,
     start_date: str | None = None,
@@ -91,7 +87,6 @@ async def search_papers(
         return {"error": f"Search failed: {error.__class__.__name__}"}
 
 
-@nber_mcp.tool()
 async def download_paper(paper_id: str, output_path: str | None = None) -> dict:
     """Download an NBER working paper as a PDF.
 
@@ -119,3 +114,16 @@ async def download_paper(paper_id: str, output_path: str | None = None) -> dict:
         return {"success": True}
     except Exception as error:
         return {"error": f"Download failed: {error.__class__.__name__}"}
+
+
+def create_mcp_server(*, include_download: bool = True) -> FastMCP:
+    """Create an MCP server with the tools allowed for its transport."""
+    server = FastMCP("nber_mcp")
+    server.add_tool(get_paper_info)
+    server.add_tool(search_papers)
+    if include_download:
+        server.add_tool(download_paper)
+    return server
+
+
+nber_mcp = create_mcp_server()
