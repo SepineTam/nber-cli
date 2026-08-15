@@ -22,11 +22,11 @@ def test_build_base_name_uses_tauri_version():
 
     assert (
         normalizer.build_base_name("windows", "x86_64-pc-windows-msvc")
-        == "NBER-CLI-Desktop-v0-10-0-Windows-x64"
+        == "NBER-CLI-Desktop-v0-11-0-Windows-x64"
     )
     assert (
         normalizer.build_base_name("linux", "x86_64-unknown-linux-gnu")
-        == "NBER-CLI-Desktop-v0-10-0-Linux-x64"
+        == "NBER-CLI-Desktop-v0-11-0-Linux-x64"
     )
 
 

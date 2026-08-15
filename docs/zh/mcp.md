@@ -1,6 +1,6 @@
 # MCP Server
 
-NBER-CLI 内置 MCP server，让 Agent 无需解析命令行文本，就能搜索 NBER、查看论文元数据和下载 PDF。
+NBER-CLI 内置 MCP server，让 Agent 无需解析命令行文本即可使用结构化论文工具。默认 stdio transport 提供搜索、论文信息和 PDF 下载；HTTP transport 有意只提供搜索和论文信息。
 
 MCP server 如何与 CLI 共用核心模块，见 [系统架构](architecture.md)。
 
@@ -54,21 +54,34 @@ nber-cli mcp-server
 uvx nber-cli mcp-server --transport streamable-http --port 8000
 ```
 
+默认 host 是 `127.0.0.1`。如需通过容器端口映射访问，容器内进程必须监听全部容器网络接口：
+
+```bash
+nber-cli mcp-server --transport streamable-http --host 0.0.0.0 --port 5090 --yes
+```
+
+项目提供的 Docker 镜像已使用该容器内部 host 设置。受支持的本机 HTTP 启动方式是：
+
+```bash
+docker compose pull
+docker compose up -d --wait
+```
+
 `--port` 只对 HTTP transport 生效。当端口设为非默认值时，需要加 `--yes` 确认：
 
 ```bash
 uvx nber-cli mcp-server --transport streamable-http --port 9000 --yes
 ```
 
-server 绑定到本地接口；应将其视为本地服务，如需远程访问请接入反向代理（或 SSH 隧道）。server 不内置身份认证：任何能访问该端口的网络位置都可以调用全部三个工具，并在宿主机文件系统中触发 PDF 下载。未经可信的反向代理认证，不要把该端口暴露在公网上。
+Compose 文件把容器的 5090 端口映射到宿主机 `127.0.0.1:5090`，因此服务仍只对宿主机本地开放。server 不内置身份认证：任何能访问 HTTP endpoint 的位置都可以调用搜索和论文信息工具。未经可信的反向代理认证，不要把宿主机绑定地址改成公网接口。
 
-客户端通过 HTTP 连接时使用标准 MCP 客户端 URL（端口与 `--port` 一致）：
+Compose 的 streamable HTTP endpoint 是：
 
 ```text
-http://127.0.0.1:8000/mcp
+http://127.0.0.1:5090/mcp
 ```
 
-使用旧版 SSE transport 时，通过 `--transport sse` 启动，并连接：
+手动启动 server 时，请使用其实际配置的端口（默认是 8000）。旧版 SSE transport 使用：
 
 ```text
 http://127.0.0.1:8000/sse
@@ -77,6 +90,8 @@ http://127.0.0.1:8000/sse
 端点路径取决于所选 transport：streamable HTTP 使用 `/mcp`，SSE 使用 `/sse`。实际主机和路径请按所接入的反向代理进行调整。
 
 ## 可用工具
+
+默认 stdio server 提供下面三个工具。Streamable HTTP 和 SSE 只提供 `get_paper_info` 与 `search_papers`。
 
 ### get_paper_info
 
@@ -107,7 +122,7 @@ http://127.0.0.1:8000/sse
 
 返回搜索元数据和论文列表。
 
-### download_paper
+### download_paper（仅 stdio）
 
 下载单篇论文 PDF。
 
@@ -122,14 +137,14 @@ http://127.0.0.1:8000/sse
 
 ## Agent 使用建议
 
-- 不知道论文编号时，先用 `search_papers`。
+- 使用 stdio 时，如果不知道论文编号，先用 `search_papers`。
 - 工作流需要确认标题、作者或摘要时，下载前先用 `get_paper_info`。
 - MCP 客户端控制隔离工作目录时，优先使用默认文件名或简单的相对 `output_path`。
 - NBER 可能会限制新发布论文第一周的访问，这类下载可能返回 HTTP 403。
 
 ## 安全说明
 
-MCP server 会向 NBER 发起网络请求，并可以通过 `download_paper` 写入 PDF 文件。请只在可信客户端中配置该 server；工具参数可能不可信时，应在隔离工作目录中启动它。
+所有 MCP transport 都会向 NBER 发起网络请求。只有默认 stdio transport 暴露 `download_paper`，并可能向磁盘写入 PDF。请只在可信客户端中配置 stdio；工具参数可能不可信时，应在隔离工作目录中启动它。Docker HTTP 服务不暴露下载工具。
 
 !!! warning "路径检查不是安全沙箱"
     0.10.0 的检查会比较绝对路径片段，但不会解析 `..` 或符号链接。因此，构造后的 `output_path` 可能通过检查，却仍写到工作目录之外。请使用简单相对文件名；真正的安全边界应依靠操作系统隔离。
@@ -142,7 +157,7 @@ MCP server 会向 NBER 发起网络请求，并可以通过 `download_paper` 写
 
 - `get_paper_info` 不接受每次调用的 `--refresh` 参数。要强制刷新，可以先关闭缓存、调用 `get_paper_info`，再打开缓存，或等待 TTL 到期后自然刷新。
 - `get_paper_info` 和 CLI 都不会向 stderr 输出缓存命中提示。
-- 当前版本的 MCP `search_papers` 与 `download_paper` 工具**不**写 `query_log` 或 `download_log`；只有 CLI 会在这两个版本中写入。
+- 当前版本的 MCP `search_papers` 与仅 stdio 提供的 `download_paper` 工具**不**写 `query_log` 或 `download_log`；只有 CLI 会写入这两个表。
 - MCP 工具的返回值就是普通 Python 字典，不会包装为 `DownloadBatchResult`。工具失败通过 `error` key 返回，而不是向 MCP 调用方抛出异常。
 
 ### 返回对象结构
@@ -151,7 +166,7 @@ MCP server 会向 NBER 发起网络请求，并可以通过 `download_paper` 写
 
 - `get_paper_info` 返回的字典与 CLI `--format json` 路径下的 `info(...)` 一致；当 `include_all=True` 时还会并入 `related(...)` 字段。`published_version` 仅在 `include_all=True` 且非空时出现。
 - `search_papers` 返回 `search_results(...)` 字典。
-- `download_paper` 成功时返回 `{"success": True}`，失败时返回 `{"error": "..."}`。
+- 仅 stdio 提供的 `download_paper` 成功时返回 `{"success": True}`，失败时返回 `{"error": "..."}`。
 
 ### 下载路径规则
 

@@ -13,6 +13,15 @@ A desktop-first, local research workspace for following National Bureau of Econo
 
 > **NBER** is a registered trademark of the [National Bureau of Economic Research](https://www.nber.org). This project is an independent open-source tool and is **not affiliated with, endorsed by, or sponsored by** the National Bureau of Economic Research. Before using the project, read the [Usage Policy](docs/en/policy.md).
 
+
+## Quickly Start
+Connect to your agent client with http-mcp: `https://nber-mcp.aidea-labs.com/mcp`
+
+- Codex: `codex mcp add nber-mcp --url https://nber-mcp.aidea-labs.com/mcp`
+- Claude Code: `claude mcp add nber-mcp -s user -t http https://nber-mcp.aidea-labs.com/mcp`
+- OpenClaw: `openclaw mcp add nber-mcp --url https://nber-mcp.aidea-labs.com/mcp`
+
+
 ## Start with Desktop
 
 For researchers, the recommended entry point is **NBER-CLI Desktop**. Download the installer for macOS, Windows, or Linux from [GitHub Releases](https://github.com/sepinetam/nber-cli/releases/latest). The app includes its own runtime: you do not need Python, uv, a terminal, or a locally running web service.

@@ -71,7 +71,7 @@ uvx nber-cli mcp-server
 - [本地 HTTP API](http-api.md)与 [Python API](python-api.md)：集成接口契约。
 - [系统架构](architecture.md)：运行组件、核心流程和信任边界。
 - [开发](development.md)、[测试](testing.md)和[贡献指南](contributing.md)：仓库工作流与质量门禁。
-- [更新日志](changelog.md)：版本历史。当前仓库版本为 **0.10.0**。
+- [更新日志](changelog.md)：版本历史。当前仓库版本为 **0.11.0**。
 
 ## 范围与状态
 

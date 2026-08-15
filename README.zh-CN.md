@@ -13,6 +13,15 @@
 
 > **NBER** 是 [美国国家经济研究局](https://www.nber.org)（National Bureau of Economic Research）的注册商标。本项目是独立的开源工具，与美国国家经济研究局**不存在任何附属、认可或赞助关系**。使用前请阅读[使用政策](docs/zh/policy.md)。
 
+
+## 快速开始
+通过 HTTP MCP 将 NBER MCP 接入你的 Agent 客户端：`https://nber-mcp.aidea-labs.com/mcp`
+
+- Codex：`codex mcp add nber-mcp --url https://nber-mcp.aidea-labs.com/mcp`
+- Claude Code：`claude mcp add nber-mcp -s user -t http https://nber-mcp.aidea-labs.com/mcp`
+- OpenClaw：`openclaw mcp add nber-mcp --url https://nber-mcp.aidea-labs.com/mcp`
+
+
 ## 从 Desktop 开始
 
 如果你是研究者，推荐直接使用 **NBER-CLI Desktop**。请从 [GitHub Releases](https://github.com/sepinetam/nber-cli/releases/latest) 下载 macOS、Windows 或 Linux 安装包。安装包已经包含运行环境，不需要另外安装 Python、uv，也不需要使用终端或启动本地 Web 服务。

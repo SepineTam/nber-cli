@@ -2,7 +2,7 @@
 
 NBER-CLI Desktop 是面向研究者的推荐入口。它是一个基于 Tauri 2 与 React、在本机运行的 NBER 工作论文跟踪、阅读和整理工作台，不需要安装 Python、uv 或浏览器扩展。
 
-当前仓库版本为 **0.10.0**。Desktop 与 Python 包使用相同版本号和 Release tag；Desktop 安装包发布在 GitHub Releases，Python 包发布在 PyPI。
+当前仓库版本为 **0.11.0**。Desktop 与 Python 包使用相同版本号和 Release tag；Desktop 安装包发布在 GitHub Releases，Python 包发布在 PyPI。
 
 ## 安装
 

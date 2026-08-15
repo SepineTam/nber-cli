@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "0.10.0"
+version = "0.11.0"
 description = "Desktop app for NBER-CLI working paper feeds."
 authors = ["Song Tan <sepinetam@gmail.com>"]
 license = "Apache-2.0"

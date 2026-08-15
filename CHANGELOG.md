@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 
 This file is the canonical release history. The English mirror at `docs/en/changelog.md` and the Chinese mirror at `docs/zh/changelog.md` are generated from the same source content and must stay in lock-step. Any release commit updates all three together.
 
-## [Unreleased]
+## [0.11.0] - 2026-08-15
+
+### Added
+
+- Added a Docker Compose setup for the local HTTP MCP service, including loopback-only port publishing, persistent metadata storage, and a container health check.
+- Added multi-platform GHCR publishing when a GitHub Release is published.
 
 ### Changed
 
 - HTTP MCP transports now expose only paper search and paper info; the download tool remains available through the default stdio transport.
+- Added `--host` to `nber-cli mcp-server`, defaulting to `127.0.0.1`; the Docker image binds to `0.0.0.0` for Compose port forwarding.
 
 ### Documentation
 

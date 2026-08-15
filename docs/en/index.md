@@ -71,7 +71,7 @@ Use the [Agent Guides](agents/index.md) for client-specific installation and ver
 - [Local HTTP API](http-api.md) and [Python API](python-api.md): integration contracts.
 - [System Architecture](architecture.md): runtime components, workflows, and trust boundaries.
 - [Development](development.md), [Testing](testing.md), and [Contributing](contributing.md): repository workflow and quality gates.
-- [Changelog](changelog.md): release history. The current repository version is **0.10.0**.
+- [Changelog](changelog.md): release history. The current repository version is **0.11.0**.
 
 ## Scope and Status
 

@@ -4,7 +4,17 @@
 
 本页是仓库根 `CHANGELOG.md` 的中文镜像，英文镜像在 `docs/en/changelog.md`。每次发布提交都会同步更新三份内容。
 
-## Unreleased
+## 0.11.0 - 2026-08-15
+
+### Added
+
+- 新增本机 HTTP MCP 服务的 Docker Compose 配置，包括仅 loopback 的端口发布、持久化元数据存储和容器健康检查。
+- 新增在 GitHub Release 发布后运行的多架构 GHCR 发布工作流。
+
+### Changed
+
+- HTTP MCP transport 现在只提供论文搜索和论文信息；下载工具仍保留在默认 stdio transport 中。
+- 为 `nber-cli mcp-server` 新增 `--host`，默认值为 `127.0.0.1`；Docker 镜像使用 `0.0.0.0` 以支持 Compose 端口转发。
 
 ### Documentation
 

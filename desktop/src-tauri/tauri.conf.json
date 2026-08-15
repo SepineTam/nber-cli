@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "NBER-CLI Desktop",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "identifier": "com.sepinetam.nber-cli-desktop",
   "build": {
     "frontendDist": "../dist",

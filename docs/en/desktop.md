@@ -2,7 +2,7 @@
 
 NBER-CLI Desktop is the recommended interface for researchers. It is a local Tauri 2 and React workspace for following, reading, and organizing NBER working papers without installing Python, uv, or a browser extension.
 
-The current repository version is **0.10.0**. Desktop and the Python package use the same version number and release tag. Desktop installers are published on GitHub Releases; the Python package is published on PyPI.
+The current repository version is **0.11.0**. Desktop and the Python package use the same version number and release tag. Desktop installers are published on GitHub Releases; the Python package is published on PyPI.
 
 ## Install
 

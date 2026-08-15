@@ -16,7 +16,16 @@ This is the default transport. Most MCP clients expect stdio and read the server
 uv run nber-cli mcp-server --transport streamable-http --port 8000 --yes
 ```
 
-The HTTP transports expose only `search_papers` and `get_paper_info`; they do not expose `download_paper`. They have no built-in authentication, so do not expose them to an untrusted network. `--port` exists in published `0.4.0`; the source tree additionally requires `--yes` for a custom port.
+The HTTP transports expose only `search_papers` and `get_paper_info`; they do not expose `download_paper`. The `--host` option defaults to `127.0.0.1`. The Docker image uses `--host 0.0.0.0` internally so a Compose `ports` mapping can reach the service. HTTP has no built-in authentication, so bind the host-side Compose port to `127.0.0.1` unless an authenticated proxy protects it. `--port` exists in published `0.4.0`; the source tree additionally requires `--yes` for a custom port.
+
+The supported Docker setup is:
+
+```bash
+docker compose pull
+docker compose up -d --wait
+```
+
+Connect to `http://127.0.0.1:5090/mcp`, inspect logs with `docker compose logs nber-mcp`, and stop it with `docker compose down`. The named volume preserves the metadata cache and configuration.
 
 ## Example MCP client configuration
 

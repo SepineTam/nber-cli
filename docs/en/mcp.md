@@ -1,6 +1,6 @@
 # MCP Server
 
-NBER-CLI includes an MCP server so agents can search NBER, inspect paper metadata, and download PDFs without scraping command output.
+NBER-CLI includes an MCP server so agents can use structured paper tools without scraping command output. The default stdio transport provides search, paper info, and PDF download. HTTP transports intentionally provide only search and paper info.
 
 For how the MCP server shares core modules with the CLI, see [System Architecture](architecture.md).
 
@@ -54,21 +54,34 @@ For clients that support streamable HTTP:
 uvx nber-cli mcp-server --transport streamable-http --port 8000
 ```
 
+The default host is `127.0.0.1`. To make the process reachable through a container port mapping, it must listen on all container interfaces:
+
+```bash
+nber-cli mcp-server --transport streamable-http --host 0.0.0.0 --port 5090 --yes
+```
+
+The supplied Docker image already uses that container-internal host setting. Start the supported local HTTP setup with:
+
+```bash
+docker compose pull
+docker compose up -d --wait
+```
+
 `--port` only applies to HTTP transports. When set to a non-default value, pass `--yes` to confirm:
 
 ```bash
 uvx nber-cli mcp-server --transport streamable-http --port 9000 --yes
 ```
 
-The server binds to the local interface; treat the bound socket as a local-only service and front it with a reverse proxy (or SSH tunnel) if you need remote access. There is no built-in authentication: anyone who can reach the bound port can call all three tools and trigger PDF downloads on the host filesystem. Do not expose the port on a public network without putting it behind a trusted authenticating proxy.
+The Compose file maps container port 5090 to host address `127.0.0.1:5090`, so the service remains local to the host. There is no built-in authentication: anyone who can reach the HTTP endpoint can call its search and paper-info tools. Do not change the host-side bind address to a public interface without a trusted authenticating proxy.
 
-When the client connects over HTTP, use the standard MCP client URL (the `--port` value):
+The Compose streamable HTTP endpoint is:
 
 ```text
-http://127.0.0.1:8000/mcp
+http://127.0.0.1:5090/mcp
 ```
 
-For the legacy SSE transport, start the server with `--transport sse` and connect to:
+For a manually started server, use its configured port (the default is 8000). The legacy SSE transport uses:
 
 ```text
 http://127.0.0.1:8000/sse
@@ -77,6 +90,8 @@ http://127.0.0.1:8000/sse
 The endpoint path depends on the selected transport: streamable HTTP uses `/mcp`, while SSE uses `/sse`. Adjust the host and path according to the reverse proxy you front the server with.
 
 ## Available Tools
+
+The default stdio server exposes all three tools below. Streamable HTTP and SSE expose only `get_paper_info` and `search_papers`.
 
 ### get_paper_info
 
@@ -107,7 +122,7 @@ Parameters:
 
 Returns search metadata and a list of papers.
 
-### download_paper
+### download_paper (stdio only)
 
 Download one paper PDF.
 
@@ -122,14 +137,14 @@ Returns `{"success": true}` when the download succeeds. Validation, path, networ
 
 ## Agent Usage Notes
 
-- Prefer `search_papers` before `download_paper` when the paper ID is unknown.
+- On stdio, prefer `search_papers` before `download_paper` when the paper ID is unknown.
 - Use `get_paper_info` before downloading when a workflow needs title, author, or abstract confirmation.
 - Prefer the default filename or a simple relative `output_path` when the MCP client controls the server process's isolated working directory.
 - NBER may restrict access to newly released papers during the first week; those downloads can return HTTP 403.
 
 ## Security Notes
 
-The MCP server performs network requests to NBER and can write PDFs to disk through `download_paper`. Configure it only in trusted clients and start it in an isolated working directory when tool arguments may be untrusted.
+All MCP transports perform network requests to NBER. Only the default stdio transport exposes `download_paper` and can write PDFs to disk. Configure stdio only in trusted clients and start it in an isolated working directory when tool arguments may be untrusted. The Docker HTTP service does not expose the download tool.
 
 !!! warning "The path check is not a sandbox"
     In 0.10.0, the check compares absolute path components without resolving `..` segments or symbolic links. A crafted `output_path` can therefore pass the check and still write outside the working directory. Use simple relative filenames and rely on operating-system isolation for a real security boundary.
@@ -142,7 +157,7 @@ The MCP server performs network requests to NBER and can write PDFs to disk thro
 
 - `get_paper_info` does not accept a per-call `--refresh` argument. To force a fresh fetch, the caller can disable the cache, call `get_paper_info`, and re-enable the cache, or wait for the TTL to expire.
 - Neither `get_paper_info` nor the CLI prints a cache-hit hint to stderr.
-- The MCP `search_papers` and `download_paper` tools do not currently write to `query_log` or `download_log`; the CLI is the only surface that records those tables in this version.
+- The MCP `search_papers` tool and the stdio-only `download_paper` tool do not currently write to `query_log` or `download_log`; the CLI is the only surface that records those tables in this version.
 - MCP tool return values are plain Python dictionaries; they do not use `DownloadBatchResult`. Tool failures are represented by an `error` key instead of being raised to the MCP caller.
 
 ### Returned Object Shapes
@@ -151,7 +166,7 @@ The tool docstrings describe the public shape. In summary:
 
 - `get_paper_info` returns the same `info(...)` dictionary as the CLI `--format json` path, plus `related(...)` fields when `include_all=True`. `published_version` is only present when truthy and `include_all=True`.
 - `search_papers` returns the `search_results(...)` dictionary.
-- `download_paper` returns `{"success": True}` on success and `{"error": "..."}` on failure.
+- The stdio-only `download_paper` returns `{"success": True}` on success and `{"error": "..."}` on failure.
 
 ### Download Path Rules
 

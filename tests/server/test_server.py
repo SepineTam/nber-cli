@@ -96,7 +96,7 @@ def test_health_version_falls_back_to_release_version(monkeypatch):
 
     monkeypatch.setattr("nber_server.routers.health.get_version", fail_version_lookup)
 
-    assert _package_version() == "0.10.0"
+    assert _package_version() == "0.11.0"
 
 
 def test_upgrade_database_creates_read_status_and_records_revision(tmp_path):
