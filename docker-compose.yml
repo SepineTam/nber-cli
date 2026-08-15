@@ -1,0 +1,16 @@
+services:
+  nber-mcp:
+    image: ghcr.io/sepinetam/nber-mcp:latest
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - nber-data:/root/.nber-cli
+    ports:
+      - "127.0.0.1:5090:5090"
+
+volumes:
+  nber-data:

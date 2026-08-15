@@ -8,6 +8,9 @@ COPY src ./src
 
 RUN uv sync --no-dev
 
-EXPOSE 8000
+EXPOSE 5090
 
-ENTRYPOINT ["uv", "run", "nber-cli", "mcp-server", "--transport", "streamable-http", "--port", "8000"]
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 \
+    CMD ["/app/.venv/bin/python", "-c", "import socket; socket.create_connection(('127.0.0.1', 5090), timeout=2).close()"]
+
+ENTRYPOINT ["/app/.venv/bin/nber-cli", "mcp-server", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "5090"]
