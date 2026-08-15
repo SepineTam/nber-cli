@@ -323,6 +323,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Transport mechanism (default: stdio).",
     )
     mcp_parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host for HTTP transports (default: 127.0.0.1).",
+    )
+    mcp_parser.add_argument(
         "--port",
         type=int,
         default=8000,
@@ -485,10 +490,13 @@ def _handle_download_errors(batch_result: DownloadBatchResult, paper_ids: list[s
         )
 
 
-def _run_mcp_server(transport: str, port: int) -> None:
+def _run_mcp_server(transport: str, host: str, port: int) -> None:
     from .mcp import create_mcp_server
 
-    mcp_server = create_mcp_server(include_download=transport == "stdio")
+    mcp_server = create_mcp_server(
+        include_download=transport == "stdio",
+        host=host,
+    )
     mcp_server.settings.port = port
     mcp_server.run(transport=cast(Literal["stdio", "sse", "streamable-http"], transport))
 
@@ -1207,5 +1215,5 @@ def main() -> None:
                 file=sys.stderr,
             )
             raise SystemExit(1)
-        _run_mcp_server(args.transport, args.port)
+        _run_mcp_server(args.transport, args.host, args.port)
         return

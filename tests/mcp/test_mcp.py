@@ -42,6 +42,11 @@ class TestMcpServerTools:
 
         assert {tool.name for tool in tools} == {"get_paper_info", "search_papers"}
 
+    def test_custom_host_is_applied(self):
+        server = create_mcp_server(include_download=False, host="0.0.0.0")
+
+        assert server.settings.host == "0.0.0.0"
+
 
 class TestParsePaperId:
     def test_with_w_prefix(self):

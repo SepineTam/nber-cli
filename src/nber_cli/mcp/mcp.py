@@ -116,9 +116,9 @@ async def download_paper(paper_id: str, output_path: str | None = None) -> dict:
         return {"error": f"Download failed: {error.__class__.__name__}"}
 
 
-def create_mcp_server(*, include_download: bool = True) -> FastMCP:
+def create_mcp_server(*, include_download: bool = True, host: str = "127.0.0.1") -> FastMCP:
     """Create an MCP server with the tools allowed for its transport."""
-    server = FastMCP("nber_mcp")
+    server = FastMCP("nber_mcp", host=host)
     server.add_tool(get_paper_info)
     server.add_tool(search_papers)
     if include_download:

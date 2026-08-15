@@ -1253,9 +1253,12 @@ class TestMainEntrypointMcpServer:
         transport,
         include_download,
     ):
-        _run_mcp_server(transport, 9000)
+        _run_mcp_server(transport, "0.0.0.0", 9000)
 
-        mock_create_server.assert_called_once_with(include_download=include_download)
+        mock_create_server.assert_called_once_with(
+            include_download=include_download,
+            host="0.0.0.0",
+        )
         mock_server = mock_create_server.return_value
         assert mock_server.settings.port == 9000
         mock_server.run.assert_called_once_with(transport=transport)
@@ -1264,13 +1267,13 @@ class TestMainEntrypointMcpServer:
     def test_mcp_server_starts_with_default_transport(self, mock_run, capsys):
         with patch.object(sys, "argv", ["nber-cli", "mcp-server"]):
             main()
-        mock_run.assert_called_once_with("stdio", 8000)
+        mock_run.assert_called_once_with("stdio", "127.0.0.1", 8000)
 
     @patch("nber_cli.cli._run_mcp_server")
     def test_mcp_server_uses_custom_port_with_yes(self, mock_run, capsys):
         with patch.object(sys, "argv", ["nber-cli", "mcp-server", "--port", "9000", "--yes"]):
             main()
-        mock_run.assert_called_once_with("stdio", 9000)
+        mock_run.assert_called_once_with("stdio", "127.0.0.1", 9000)
 
     @patch("nber_cli.cli._run_mcp_server")
     def test_mcp_server_rejects_custom_port_without_yes(self, mock_run, capsys):
@@ -1283,7 +1286,25 @@ class TestMainEntrypointMcpServer:
     def test_mcp_server_uses_streamable_http(self, mock_run, capsys):
         with patch.object(sys, "argv", ["nber-cli", "mcp-server", "--transport", "streamable-http"]):
             main()
-        mock_run.assert_called_once_with("streamable-http", 8000)
+        mock_run.assert_called_once_with("streamable-http", "127.0.0.1", 8000)
+
+    @patch("nber_cli.cli._run_mcp_server")
+    def test_mcp_server_uses_custom_host(self, mock_run, capsys):
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "nber-cli",
+                "mcp-server",
+                "--transport",
+                "streamable-http",
+                "--host",
+                "0.0.0.0",
+            ],
+        ):
+            main()
+
+        mock_run.assert_called_once_with("streamable-http", "0.0.0.0", 8000)
 
 
 class TestMainEntrypointDb:
