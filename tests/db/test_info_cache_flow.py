@@ -119,9 +119,12 @@ class TestGetPaperWithInfoCache:
         assert db.count_info_cache(db_path) == 0
 
     async def test_invalid_page_is_not_cached(self, db_path):
-        with patch(
-            "nber_cli.fetch.fetcher._load_page_sync",
-            return_value="<html><head></head><body></body></html>",
+        with (
+            patch(
+                "nber_cli.fetch.fetcher._load_page_sync",
+                return_value="<html><head></head><body></body></html>",
+            ),
+            patch("nber_cli.fetch.fetcher.time.sleep"),
         ):
             with pytest.raises(ValueError, match="missing citation title"):
                 await get_paper_with_info_cache(1234)

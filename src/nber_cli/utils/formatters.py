@@ -15,7 +15,7 @@ _TEXT_WIDTH = 88
 
 
 def paper_id_str(paper: NBER) -> str:
-    return f"w{paper.paper_id:04d}"
+    return f"{paper.series}{paper.paper_id:04d}"
 
 
 def info(paper: NBER) -> dict:

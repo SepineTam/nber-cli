@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 from .mcp import (
+    _parse_paper_code,
     _parse_paper_id,
     create_mcp_server,
     download_paper,
@@ -21,6 +22,7 @@ from .mcp import (
 )
 
 __all__ = [
+    "_parse_paper_code",
     "_parse_paper_id",
     "create_mcp_server",
     "download_paper",

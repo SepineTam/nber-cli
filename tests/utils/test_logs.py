@@ -103,6 +103,12 @@ class TestRecordInfo:
         rows = _fetch_all(db_path, "info_log")
         assert len(rows) == 3
 
+    def test_preserves_historical_series_prefix(self, db_path):
+        db.record_info(db_path, "h0065")
+
+        rows = _fetch_all(db_path, "info_log")
+        assert rows[0][2] == "h0065"
+
 
 class TestFailureHandling:
     def test_record_query_swallows_errors(self, capsys, tmp_path):

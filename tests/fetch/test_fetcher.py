@@ -17,6 +17,7 @@ from nber_cli.config import NBER_CLI_CONFIG
 from nber_cli.fetch.fetcher import (
     _NBER_REQUEST_HEADERS,
     _build_search_params,
+    _load_json_sync,
     _load_text_sync,
     _parse_search_payload,
     get_nber,
@@ -176,6 +177,22 @@ class TestLoadTextSyncRetry:
         assert mock_sleep.call_count == 2
 
 
+class TestLoadJsonSyncRetry:
+    def test_retries_when_success_response_is_not_json(self):
+        with (
+            patch(
+                "nber_cli.fetch.fetcher._load_text_sync",
+                side_effect=["<html>temporary error</html>", '{"results": []}'],
+            ) as mock_load,
+            patch("nber_cli.fetch.fetcher.time.sleep") as mock_sleep,
+        ):
+            payload = _load_json_sync("https://example.com/search", {"q": "labor"})
+
+        assert payload == {"results": []}
+        assert mock_load.call_count == 2
+        assert mock_sleep.call_count == 1
+
+
 class TestParsePage:
     def test_parses_full_page(self):
         page = """<html><head>
@@ -212,6 +229,31 @@ class TestParsePage:
         assert result.published_version == "Published in Journal of Economics, 2024."
         assert result.topic == "Labor Economics; Labor Supply & Demand"
         assert result.programs == "Labor Studies; Development Economics"
+
+    def test_decodes_entities_and_accepts_reordered_meta_attributes(self):
+        page = """
+<meta content="Women&#039;s Work &amp; Family" name="citation_title">
+<meta content="A &amp; B" name="citation_author">
+<meta content="w1234" name="citation_technical_report_number">
+"""
+        from nber_cli.fetch.fetcher import parse_page
+
+        result = parse_page(page)
+
+        assert result.title == "Women's Work & Family"
+        assert result.authors == ["A & B"]
+
+    def test_parses_historical_series_id(self):
+        page = """
+<meta name="citation_title" content="Historical Paper">
+<meta name="citation_technical_report_number" content="h0065">
+"""
+        from nber_cli.fetch.fetcher import parse_page
+
+        result = parse_page(page)
+
+        assert result.paper_id == 65
+        assert result.series == "h"
 
     def test_rejects_missing_required_fields(self):
         page = "<html><head></head><body></body></html>"
@@ -268,6 +310,36 @@ class TestParsePage:
 
 @pytest.mark.asyncio
 class TestGetNber:
+    async def test_retries_invalid_page_then_parses_valid_page(self):
+        invalid_page = "<html><body>temporary upstream page</body></html>"
+        valid_page = """
+<meta name="citation_title" content="Recovered Paper">
+<meta name="citation_technical_report_number" content="w1234">
+"""
+        with (
+            patch(
+                "nber_cli.fetch.fetcher._load_page_sync",
+                side_effect=[invalid_page, valid_page],
+            ) as mock_load,
+            patch("nber_cli.fetch.fetcher.time.sleep") as mock_sleep,
+        ):
+            paper = await get_nber(1234)
+
+        assert paper.title == "Recovered Paper"
+        assert mock_load.call_count == 2
+        assert mock_sleep.call_count == 1
+
+    async def test_fetches_historical_series(self):
+        page = """
+<meta name="citation_title" content="Historical Paper">
+<meta name="citation_technical_report_number" content="h0065">
+"""
+        with patch("nber_cli.fetch.fetcher._load_page_sync", return_value=page):
+            paper = await get_nber(65, series="h")
+
+        assert paper.series == "h"
+        assert paper.paper_id == 65
+
     async def test_rejects_mismatched_response_id_without_session(self):
         page = """
 <meta name="citation_title" content="Another Paper">
@@ -284,7 +356,7 @@ class TestGetNber:
 """
         session = MagicMock()
         with patch(
-            "nber_cli.fetch.fetcher._load_page_with_retry",
+            "nber_cli.fetch.fetcher._load_page",
             new_callable=AsyncMock,
             return_value=page,
         ):
@@ -375,6 +447,16 @@ class TestParseSearchResult:
         assert result.date == "Jan 2024"
         assert result.abstract == "Abstract text."
         assert result.url == "https://www.nber.org/papers/w12345"
+
+    def test_preserves_historical_series_id(self):
+        from nber_cli.fetch.fetcher import _parse_search_result
+
+        result = _parse_search_result(
+            {"url": "/papers/h0065", "title": "Historical Paper"}
+        )
+
+        assert result.paper_id == 65
+        assert result.series == "h"
 
     def test_handles_missing_url(self):
         from nber_cli.fetch.fetcher import _parse_search_result
@@ -505,6 +587,25 @@ class TestRetryAsync:
         assert mock_sleep.call_count == 1
 
     @pytest.mark.asyncio
+    async def test_retries_on_invalid_nber_response(self):
+        from nber_cli.fetch.fetcher import NBERResponseError, _retry_async
+
+        calls = [0]
+
+        async def _loader():
+            calls[0] += 1
+            if calls[0] < 2:
+                raise NBERResponseError("invalid response")
+            return "ok"
+
+        with patch("nber_cli.fetch.fetcher.asyncio.sleep") as mock_sleep:
+            result = await _retry_async(_loader)
+
+        assert result == "ok"
+        assert calls[0] == 2
+        assert mock_sleep.call_count == 1
+
+    @pytest.mark.asyncio
     async def test_retries_on_timeout(self):
         import asyncio
         from nber_cli.fetch.fetcher import _retry_async
@@ -560,6 +661,12 @@ class TestRetryClassification:
         error.code = 408
         assert _should_retry_http_error(error) is True
 
+    def test_http_429_is_retryable(self):
+        from nber_cli.fetch.fetcher import _should_retry_http_error
+        error = MagicMock()
+        error.code = 429
+        assert _should_retry_http_error(error) is True
+
     def test_http_404_is_not_retryable(self):
         from nber_cli.fetch.fetcher import _should_retry_http_error
         error = MagicMock()
@@ -588,6 +695,12 @@ class TestRetryClassification:
         from nber_cli.fetch.fetcher import _should_retry_aiohttp_error
         error = MagicMock()
         error.status = 408
+        assert _should_retry_aiohttp_error(error) is True
+
+    def test_aiohttp_429_is_retryable(self):
+        from nber_cli.fetch.fetcher import _should_retry_aiohttp_error
+        error = MagicMock()
+        error.status = 429
         assert _should_retry_aiohttp_error(error) is True
 
     def test_aiohttp_404_is_not_retryable(self):
@@ -635,7 +748,7 @@ class TestLoadJson:
         from nber_cli.fetch.fetcher import _load_json
         mock_response = AsyncMock()
         mock_response.raise_for_status = MagicMock()
-        mock_response.json.return_value = {"key": "value"}
+        mock_response.text.return_value = '{"key": "value"}'
         mock_session = MagicMock()
         mock_session.get.return_value.__aenter__ = AsyncMock(return_value=mock_response)
         mock_session.get.return_value.__aexit__ = AsyncMock(return_value=False)

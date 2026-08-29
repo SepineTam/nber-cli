@@ -15,36 +15,51 @@ from mcp.server.fastmcp import FastMCP
 from ..db import db
 from ..db.info_cache import get_paper_with_info_cache
 from ..fetch.download import download_paper as download_paper_to_dir, download_paper_to_file
-from ..fetch.fetcher import search_nber
+from ..fetch.fetcher import get_nber, search_nber
 from ..utils.formatters import info, related, search_results
 
 
-_PAPER_ID_RE = re.compile(r"^w?\d+$", re.IGNORECASE)
+_PAPER_ID_RE = re.compile(r"^(?P<series>[wh])?(?P<number>\d+)$", re.IGNORECASE)
+
+
+def _parse_paper_code(paper_id_str: str) -> tuple[str, int]:
+    match = _PAPER_ID_RE.fullmatch(paper_id_str)
+    if match is None:
+        raise ValueError(f"invalid paper ID: {paper_id_str}")
+    series = (match.group("series") or "w").lower()
+    paper_id = int(match.group("number"))
+    if paper_id <= 0:
+        raise ValueError(f"invalid paper ID: {paper_id_str}")
+    return series, paper_id
 
 
 def _parse_paper_id(paper_id_str: str) -> int:
-    if not _PAPER_ID_RE.fullmatch(paper_id_str):
+    series, paper_id = _parse_paper_code(paper_id_str)
+    if series != "w":
         raise ValueError(f"invalid paper ID: {paper_id_str}")
-    cleaned = paper_id_str.lower().removeprefix("w")
-    return int(cleaned)
+    return paper_id
 
 
 async def get_paper_info(paper_id: str, include_all: bool = True) -> dict:
     """Fetch metadata and abstract for an NBER working paper by ID.
 
     Args:
-        paper_id: Paper ID, e.g. 'w1234' or '1234'
+        paper_id: Paper ID, e.g. 'w1234', 'h0065', or '1234'
         include_all: Whether to include related fields and published version
 
     Returns:
         Dictionary containing paper metadata.
     """
-    nber_id = _parse_paper_id(paper_id)
+    series, nber_id = _parse_paper_code(paper_id)
+    paper_code = f"{series}{nber_id:04d}"
     try:
-        paper = await get_paper_with_info_cache(nber_id)
+        if series == "w":
+            paper = await get_paper_with_info_cache(nber_id)
+        else:
+            paper = await get_nber(nber_id, series=series)
     except Exception as error:
         return {"error": f"Failed to fetch paper {paper_id}: {error}"}
-    db.record_info(None, nber_id)
+    db.record_info(None, paper_code)
 
     result = info(paper)
     if include_all:
@@ -84,7 +99,8 @@ async def search_papers(
         )
         return search_results(results)
     except Exception as error:
-        return {"error": f"Search failed: {error.__class__.__name__}"}
+        message = str(error).strip() or error.__class__.__name__
+        return {"error": f"Search failed: {message}"}
 
 
 async def download_paper(paper_id: str, output_path: str | None = None) -> dict:

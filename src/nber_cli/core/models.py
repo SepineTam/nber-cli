@@ -32,6 +32,7 @@ class NBER:
     published_version: str | None = None
     topic: str | None = None
     programs: str | None = None
+    series: str = "w"
 
     def __post_init__(self) -> None:
         if not isinstance(self.paper_id, int) or self.paper_id < 0:
@@ -44,6 +45,8 @@ class NBER:
             raise TypeError(f"date must be a string, got {type(self.date).__name__}")
         if not isinstance(self.abstract, str):
             raise TypeError(f"abstract must be a string, got {type(self.abstract).__name__}")
+        if self.series not in {"w", "h"}:
+            raise ValueError(f"series must be 'w' or 'h', got {self.series!r}")
 
 
 @dataclass

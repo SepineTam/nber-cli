@@ -775,7 +775,7 @@ def _normalize_paper_id(paper_id: str | int) -> str:
     if isinstance(paper_id, int):
         return _paper_id_to_str(paper_id)
     cleaned = paper_id.strip().lower()
-    if cleaned.startswith("w"):
+    if cleaned.startswith(("w", "h")):
         return cleaned
     return f"w{cleaned}"
 

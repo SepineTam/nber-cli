@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from nber_cli.mcp import (
+    _parse_paper_code,
     _parse_paper_id,
     create_mcp_server,
     download_paper,
@@ -59,6 +60,13 @@ class TestParsePaperId:
         with pytest.raises(ValueError):
             _parse_paper_id("abc")
 
+    def test_historical_code(self):
+        assert _parse_paper_code("h0065") == ("h", 65)
+
+    def test_historical_code_is_not_a_working_paper_id(self):
+        with pytest.raises(ValueError):
+            _parse_paper_id("h0065")
+
 
 class TestGetPaperInfo:
     @pytest.mark.asyncio
@@ -104,6 +112,32 @@ class TestGetPaperInfo:
         assert "error" in result
         assert "Failed to fetch paper w1234" in result["error"]
 
+    @pytest.mark.asyncio
+    async def test_returns_historical_paper_info(self):
+        from nber_cli.core.models import NBER
+
+        mock_paper = NBER(
+            paper_id=65,
+            series="h",
+            title="Historical Paper",
+            authors=["Author A"],
+            date="1994/12/01",
+            abstract="Historical abstract.",
+        )
+        with (
+            patch(
+                "nber_cli.mcp.mcp.get_nber",
+                new_callable=AsyncMock,
+                return_value=mock_paper,
+            ) as mock_get_nber,
+            patch("nber_cli.mcp.mcp.db.record_info") as mock_record,
+        ):
+            result = await get_paper_info("h0065", include_all=False)
+
+        assert result["id"] == "h0065"
+        mock_get_nber.assert_awaited_once_with(65, series="h")
+        mock_record.assert_called_once_with(None, "h0065")
+
 
 class TestSearchPapers:
     @pytest.mark.asyncio
@@ -129,6 +163,48 @@ class TestSearchPapers:
 
         assert result["query"] == "inflation"
         assert result["total_results"] == 1
+
+    @pytest.mark.asyncio
+    async def test_preserves_historical_result_id(self):
+        from nber_cli.core.models import NBER, NBERSearchResults
+
+        mock_results = NBERSearchResults(
+            query="Goldin",
+            total_results=1,
+            results=[
+                NBER(
+                    paper_id=65,
+                    series="h",
+                    title="Cliometrics and the Nobel",
+                    authors=["Claudia Goldin"],
+                    date="December 1994",
+                    abstract="Abstract.",
+                )
+            ],
+            page=1,
+            per_page=20,
+        )
+        with patch(
+            "nber_cli.mcp.mcp.search_nber",
+            new_callable=AsyncMock,
+            return_value=mock_results,
+        ):
+            result = await search_papers("Goldin")
+
+        assert result["results"][0]["id"] == "h0065"
+
+    @pytest.mark.asyncio
+    async def test_returns_actionable_search_error(self):
+        with patch(
+            "nber_cli.mcp.mcp.search_nber",
+            new_callable=AsyncMock,
+            side_effect=RuntimeError("NBER search returned a non-JSON response"),
+        ):
+            result = await search_papers("Goldin")
+
+        assert result == {
+            "error": "Search failed: NBER search returned a non-JSON response"
+        }
 
 
 class TestDownloadPaper:
