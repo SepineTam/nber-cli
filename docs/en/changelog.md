@@ -4,6 +4,15 @@ All notable changes to this project will be documented here.
 
 This page mirrors the canonical `CHANGELOG.md` at the repository root. The Chinese mirror at `docs/zh/changelog.md` carries the same content. Any release commit updates all three together.
 
+## 0.11.1 - 2026-08-30
+
+### Fixed
+
+- Retried malformed search responses, HTTP 408/429 responses, transient server errors, and temporarily invalid paper pages instead of failing immediately.
+- Replaced brittle citation-meta regular expressions with HTML parsing that accepts attribute-order changes and decodes entities in titles, authors, abstracts, and publication details.
+- Preserved Historical Paper series IDs such as `h0065` in search results and added MCP paper-info support for those IDs instead of returning `w0000` or rejecting them.
+- Returned an actionable search failure message after retries are exhausted.
+
 ## 0.11.0 - 2026-08-15
 
 ### Added

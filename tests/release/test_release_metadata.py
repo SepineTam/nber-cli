@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_VERSION = "0.11.0"
+EXPECTED_VERSION = "0.11.1"
 
 
 def _read_json(path: str) -> dict:
@@ -42,9 +42,9 @@ def test_release_versions_are_synchronized():
 
 def test_release_changelogs_include_current_version():
     headings = {
-        "CHANGELOG.md": f"## [{EXPECTED_VERSION}] - 2026-08-15",
-        "docs/en/changelog.md": f"## {EXPECTED_VERSION} - 2026-08-15",
-        "docs/zh/changelog.md": f"## {EXPECTED_VERSION} - 2026-08-15",
+        "CHANGELOG.md": f"## [{EXPECTED_VERSION}] - 2026-08-30",
+        "docs/en/changelog.md": f"## {EXPECTED_VERSION} - 2026-08-30",
+        "docs/zh/changelog.md": f"## {EXPECTED_VERSION} - 2026-08-30",
     }
 
     for path, heading in headings.items():
