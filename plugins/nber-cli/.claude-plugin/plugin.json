@@ -18,7 +18,8 @@
     "research"
   ],
   "skills": [
-    "./skills/NBER-CLI"
+    "./skills/NBER-CLI",
+    "./skills/trace-nber-latest"
   ],
   "mcpServers": "./.mcp.json"
 }
