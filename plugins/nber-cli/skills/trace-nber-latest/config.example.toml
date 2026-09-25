@@ -1,0 +1,14 @@
+[embedding]
+provider = "openai"
+
+base_url = "https://api.openai.com/v1"
+api_env = "OPENAI_API_KEY"
+api_key = ""  # 如果不想通过环境变量，可在此填写真实 key（仅限本地 config.toml）
+model = "text-embedding-3-small"
+
+[filter]
+topics = ["labor economics", "gender", "immigration"]
+threshold = 0.72  # cosine similarity 阈值
+
+[output]
+dir = "./output"

@@ -1,0 +1,10 @@
+# 本地真实配置，不要提交
+config.toml
+
+# 脚本输出
+output/
+
+# 临时文件
+*.log
+__pycache__/
+*.pyc
