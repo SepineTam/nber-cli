@@ -44,6 +44,8 @@ plugins:
           build: true
           nav:
             - Home: index.md
+            - Product Website: https://aidea-labs.com/open/projects/nber-cli
+            - AIdeaLabs: https://aidea-labs.com/
             - Getting Started: getting-started.md
             - User Manual: user-manual.md
             - Researcher Guide:
@@ -76,6 +78,8 @@ plugins:
           build: true
           nav:
             - 首页: index.md
+            - 产品官网: https://aidea-labs.com/open/projects/nber-cli
+            - AIdeaLabs: https://aidea-labs.com/
             - 快速开始: getting-started.md
             - 用户操作手册: user-manual.md
             - 研究者指南:
@@ -124,6 +128,12 @@ markdown_extensions:
 extra:
   generator: false
   social:
+    - icon: material/home
+      link: https://aidea-labs.com/open/projects/nber-cli
+      name: NBER-CLI official website
+    - icon: material/web
+      link: https://aidea-labs.com/
+      name: AIdeaLabs
     - icon: fontawesome/brands/github
       link: https://github.com/sepinetam
   alternate:
@@ -136,6 +146,8 @@ extra:
 
 nav:
   - Home: index.md
+  - Product Website: https://aidea-labs.com/open/projects/nber-cli
+  - AIdeaLabs: https://aidea-labs.com/
   - Getting Started: getting-started.md
   - User Manual: user-manual.md
   - Researcher Guide:

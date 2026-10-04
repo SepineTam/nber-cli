@@ -1,12 +1,12 @@
 {
   "name": "nber-cli",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "description": "Use NBER-CLI to search, inspect, download, and serve NBER working paper workflows.",
   "author": {
     "name": "Song Tan",
     "email": "sepinetam@gmail.com"
   },
-  "homepage": "https://github.com/sepinetam/nber-cli",
+  "homepage": "https://aidea-labs.com/open/projects/nber-cli",
   "repository": "https://github.com/sepinetam/nber-cli",
   "license": "Apache-2.0",
   "keywords": [
@@ -25,7 +25,7 @@
     "developerName": "Song Tan",
     "category": "Productivity",
     "capabilities": [],
-    "websiteURL": "https://github.com/sepinetam/nber-cli",
+    "websiteURL": "https://aidea-labs.com/open/projects/nber-cli",
     "defaultPrompt": "Help me use NBER-CLI to search or download NBER working papers."
   }
 }

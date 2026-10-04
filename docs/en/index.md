@@ -1,5 +1,7 @@
 # NBER-CLI
 
+[Product website](https://aidea-labs.com/open/projects/nber-cli) · [AIdeaLabs](https://aidea-labs.com/)
+
 NBER-CLI is a desktop-first, local research workspace for following NBER working papers. Researchers use the Desktop app; AI agents and automation use the MCP server or CLI. A Python API and optional loopback HTTP API are available for custom integrations.
 
 ## Recommended: Desktop

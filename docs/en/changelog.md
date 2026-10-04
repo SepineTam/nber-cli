@@ -4,6 +4,13 @@ All notable changes to this project will be documented here.
 
 This page mirrors the canonical `CHANGELOG.md` at the repository root. The Chinese mirror at `docs/zh/changelog.md` carries the same content. Any release commit updates all three together.
 
+## 0.11.2 - 2026-10-04
+
+### Fixed
+
+- Corrected package and Claude/Codex plugin homepage links to the NBER-CLI product website.
+- Added product website and AIdeaLabs links to the English and Chinese README files, documentation homepages, navigation, and footer.
+
 ## 0.11.1 - 2026-08-30
 
 ### Fixed

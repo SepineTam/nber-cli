@@ -10,7 +10,7 @@ A desktop-first, local research workspace for following National Bureau of Econo
 [![PyPI version](https://img.shields.io/pypi/v/nber-cli.svg)](https://pypi.org/project/nber-cli/)
 [![PyPI Downloads](https://static.pepy.tech/badge/nber-cli)](https://pepy.tech/projects/nber-cli)
 
-[简体中文](README.zh-CN.md) | [Documentation](docs/en/index.md)
+[简体中文](README.zh-CN.md) | [Product website](https://aidea-labs.com/open/projects/nber-cli) | [Documentation](docs/en/index.md) | [AIdeaLabs](https://aidea-labs.com/)
 
 > **NBER** is a registered trademark of the [National Bureau of Economic Research](https://www.nber.org). This project is an independent open-source tool and is **not affiliated with, endorsed by, or sponsored by** the National Bureau of Economic Research. Before using the project, read the [Usage Policy](docs/en/policy.md).
 

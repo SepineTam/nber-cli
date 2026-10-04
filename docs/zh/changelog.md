@@ -4,6 +4,13 @@
 
 本页是仓库根 `CHANGELOG.md` 的中文镜像，英文镜像在 `docs/en/changelog.md`。每次发布提交都会同步更新三份内容。
 
+## 0.11.2 - 2026-10-04
+
+### Fixed
+
+- 将 Python 包和 Claude/Codex 插件的官网地址统一为 NBER-CLI 产品官网。
+- 为中英文 README、文档首页、导航和页脚补充产品官网与 AIdeaLabs 入口。
+
 ## 0.11.1 - 2026-08-30
 
 ### Fixed

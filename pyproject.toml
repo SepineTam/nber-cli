@@ -1,6 +1,6 @@
 [project]
 name = "nber-cli"
-version = "0.11.1"
+version = "0.11.2"
 description = "A command-line interface for accessing National Bureau of Economic Research (NBER) papers without a browser."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -48,7 +48,7 @@ nber-server = "nber_server.main:main"
 nber-sidecar = "nber_server.main:main"
 
 [project.urls]
-Homepage = "https://github.com/sepinetam/nber-cli"
+Homepage = "https://aidea-labs.com/open/projects/nber-cli"
 Repository = "https://github.com/sepinetam/nber-cli"
 Issues = "https://github.com/sepinetam/nber-cli/issues"
 Documentation = "https://sepinetam.github.io/nber-cli/"

@@ -1,5 +1,7 @@
 # NBER-CLI
 
+[产品官网](https://aidea-labs.com/open/projects/nber-cli) · [AIdeaLabs](https://aidea-labs.com/)
+
 NBER-CLI 是一个以 Desktop 为主要入口、在本机运行的 NBER 工作论文研究工作台。研究者使用 Desktop；AI Agent 和自动化任务使用 MCP Server 或 CLI；定制集成还可以使用 Python API 和可选的 loopback HTTP API。
 
 ## 推荐入口：Desktop

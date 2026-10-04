@@ -10,7 +10,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/nber-cli.svg)](https://pypi.org/project/nber-cli/)
 [![PyPI Downloads](https://static.pepy.tech/badge/nber-cli)](https://pepy.tech/projects/nber-cli)
 
-[English](README.md) | [中文文档](docs/zh/index.md)
+[English](README.md) | [产品官网](https://aidea-labs.com/open/projects/nber-cli) | [中文文档](docs/zh/index.md) | [AIdeaLabs](https://aidea-labs.com/)
 
 > **NBER** 是 [美国国家经济研究局](https://www.nber.org)（National Bureau of Economic Research）的注册商标。本项目是独立的开源工具，与美国国家经济研究局**不存在任何附属、认可或赞助关系**。使用前请阅读[使用政策](docs/zh/policy.md)。
 
