@@ -23,12 +23,40 @@ Running `nber-cli` without a subcommand prints the top-level help and exits succ
 | --- | --- |
 | `download` | Download one or more paper PDFs. |
 | `info` | Show metadata and abstract for one paper. |
+| `cite` | Copy or print a paper citation. |
 | `search` | Search NBER working papers. |
 | `db` | Manage the local SQLite database. |
 | `feed` | Manage the NBER new working papers RSS feed cache. |
 | `config` | Inspect and edit `~/.nber-cli/config.json`. |
 | `doctor` | Inspect the local installation, config, database, and package version status. |
 | `mcp-server` | Start the MCP server for agents. |
+
+## cite
+
+Copy a single NBER working-paper bibliography entry (not an in-text citation):
+
+```bash
+uvx nber-cli cite w1234
+uvx nber-cli cite w1234 -f apa
+uvx nber-cli cite w1234 --format gb
+uvx nber-cli cite w1234 --stdout > references.bib
+uvx nber-cli cite w1234 --refresh
+```
+
+| Option | Description |
+| --- | --- |
+| `paper_id` | Positive paper ID such as `w1234` or `1234`; case insensitive. |
+| `--format`, `-f` | `bib` (default; alias `bibtex`), `apa`, `mla`, `harvard`, `chicago`, `gb` (alias `gbt7714`). |
+| `--stdout` | Print only the citation, without accessing the clipboard. |
+| `--refresh` | Fetch fresh metadata, using the same cache settings as `info`. |
+
+Styles target APA 7th, MLA 9th, Chicago 18th bibliography, and GB/T 7714—2025 sequential-reference entries (without an assigned list number). Harvard uses this project's fixed author–date working-paper profile; Harvard has no single universal specification. Formatted references are plain text, without italics or Markdown. Verify journal-specific requirements and ambiguous author names before publication.
+
+References always describe the NBER working paper, even when a published version exists. BibTeX uses `@techreport` and the stable key `nberw1234`, escapes TeX special characters, and omits missing author/year fields. Other styles use `Unknown author` / `n.d.` for missing metadata. The current metadata model has no DOI field; entries use the paper URL. GB entries include the local access date. No publication location is inferred.
+
+On success, clipboard mode writes only a confirmation to stderr. On clipboard failure, the generated citation is printed to stdout, an explanation goes to stderr, and the command exits with code 1. Invalid arguments exit with code 2 before fetching; fetch/format errors exit with code 1 without changing the clipboard.
+
+Clipboard support uses `pbcopy` on macOS, PowerShell `Set-Clipboard` on Windows, and `wl-copy` (Wayland) or `xclip` / `xsel` (X11) on Linux. Linux requires a desktop session and an installed clipboard utility. Use `--stdout` on servers or over SSH; remote execution targets the remote host's clipboard.
 
 ## download
 

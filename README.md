@@ -15,6 +15,17 @@ A desktop-first, local research workspace for following National Bureau of Econo
 > **NBER** is a registered trademark of the [National Bureau of Economic Research](https://www.nber.org). This project is an independent open-source tool and is **not affiliated with, endorsed by, or sponsored by** the National Bureau of Economic Research. Before using the project, read the [Usage Policy](docs/en/policy.md).
 
 
+## CLI citations
+
+```bash
+uvx nber-cli cite w1234                 # BibTeX → clipboard
+uvx nber-cli cite w1234 -f apa
+uvx nber-cli cite w1234 -f gb
+uvx nber-cli cite w1234 --stdout > references.bib
+```
+
+See [cite options and clipboard requirements](docs/en/cli.md#cite).
+
 ## Quickly Start
 Connect to your agent client with http-mcp: `https://nber-mcp.aidea-labs.com/mcp`
 

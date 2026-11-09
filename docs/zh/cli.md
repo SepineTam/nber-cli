@@ -23,12 +23,40 @@ nber-cli [--version] <command> [options]
 | --- | --- |
 | `download` | 下载一篇或多篇论文 PDF。 |
 | `info` | 显示单篇论文的元数据和摘要。 |
+| `cite` | 复制论文引用，或输出到 stdout。 |
 | `search` | 搜索 NBER 工作论文。 |
 | `db` | 管理本地 SQLite 数据库。 |
 | `feed` | 管理 NBER 最新工作论文 RSS feed 的本地缓存。 |
 | `config` | 查看和编辑 `~/.nber-cli/config.json`。 |
 | `doctor` | 检查本地安装、配置、数据库和包版本状态。 |
 | `mcp-server` | 启动给 Agent 使用的 MCP server。 |
+
+## cite
+
+复制一篇 NBER 工作论文的完整参考文献条目：
+
+```bash
+uvx nber-cli cite w1234
+uvx nber-cli cite w1234 -f apa
+uvx nber-cli cite w1234 --format gb
+uvx nber-cli cite w1234 --stdout > references.bib
+uvx nber-cli cite w1234 --refresh
+```
+
+| 参数 | 说明 |
+| --- | --- |
+| `paper_id` | 正数论文编号，如 `w1234` 或 `1234`，不区分大小写。 |
+| `--format`, `-f` | `bib`（默认，别名 `bibtex`）、`apa`、`mla`、`harvard`、`chicago`、`gb`（别名 `gbt7714`）。 |
+| `--stdout` | 仅将引用写入标准输出，不访问剪贴板。 |
+| `--refresh` | 重新获取元数据，复用 `info` 的缓存设置。 |
+
+格式分别面向 APA 第 7 版、MLA 第 9 版、Chicago 第 18 版参考文献表和 GB/T 7714—2025 顺序编码制条目（不分配列表序号）。Harvard 没有统一规范，本项目固定使用作者—年份工作论文格式。输出均为纯文本，不含斜体或 Markdown；正式使用时需核对期刊要求及有歧义的作者姓名。
+
+引用始终指向 NBER 工作论文，不自动替换为期刊发表版本。BibTeX 使用 `@techreport` 和稳定引用键 `nberw1234`，转义 TeX 特殊字符，缺失作者或年份时省略对应字段；其他格式以 `Unknown author` / `n.d.` 表示缺失信息。现有元数据模型不含 DOI，使用论文 URL。国标条目包含本机访问日期，不推断出版地。
+
+复制成功仅向 stderr 输出提示。复制失败时仍向 stdout 输出引用，向 stderr 说明原因，并以退出码 1 结束。参数错误在获取前返回退出码 2；获取或格式化失败返回 1，不修改剪贴板。
+
+macOS 使用 `pbcopy`，Windows 使用 PowerShell `Set-Clipboard`，Linux 使用 `wl-copy`（Wayland）或 `xclip` / `xsel`（X11），需要桌面会话及对应工具。服务器或 SSH 环境建议使用 `--stdout`；远程运行操作的是远程主机的剪贴板。
 
 ## download
 

@@ -15,6 +15,17 @@
 > **NBER** 是 [美国国家经济研究局](https://www.nber.org)（National Bureau of Economic Research）的注册商标。本项目是独立的开源工具，与美国国家经济研究局**不存在任何附属、认可或赞助关系**。使用前请阅读[使用政策](docs/zh/policy.md)。
 
 
+## CLI 引用
+
+```bash
+uvx nber-cli cite w1234                 # BibTeX → clipboard
+uvx nber-cli cite w1234 -f apa
+uvx nber-cli cite w1234 -f gb
+uvx nber-cli cite w1234 --stdout > references.bib
+```
+
+支持 `bib`、`apa`、`mla`、`harvard`、`chicago`、`gb`；详见 [cite 参数和剪贴板要求](docs/zh/cli.md#cite)。
+
 ## 快速开始
 通过 HTTP MCP 将 NBER MCP 接入你的 Agent 客户端：`https://nber-mcp.aidea-labs.com/mcp`
 
