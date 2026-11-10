@@ -30,6 +30,8 @@ from typing import Literal, TypedDict, cast
 from aiohttp import ClientError, ClientResponseError
 from packaging.version import InvalidVersion, parse as parse_version
 
+from .citation import FORMATS, FORMAT_ALIASES, FORMAT_LABELS, format_citation
+from .clipboard import ClipboardError, copy_text
 from .config import config_store
 from .db import db
 from .core.models import DownloadBatchResult, NBERFeedCleanResult, NBERInfoCacheClearResult
@@ -137,6 +139,13 @@ def _build_parser() -> argparse.ArgumentParser:
         dest="concurrency",
         help="Maximum concurrent downloads. Overrides config value.",
     )
+
+    cite_parser = subparsers.add_parser("cite", help="Copy a paper citation to the clipboard.")
+    cite_parser.add_argument("paper_id", help="Paper ID, e.g. w1234 or 1234.")
+    cite_parser.add_argument("--format", "-f", choices=FORMATS, default="bib", dest="citation_format",
+                             help="Citation format (default: bib). bibtex and gbt7714 are aliases.")
+    cite_parser.add_argument("--stdout", action="store_true", help="Print the citation without copying.")
+    cite_parser.add_argument("--refresh", action="store_true", help="Refresh paper metadata from NBER.")
 
     info_parser = subparsers.add_parser("info", help="Show information about an NBER paper.")
     info_parser.add_argument("paper_id", help="Paper ID, e.g. w1234, or 'cache' to manage cache.")
@@ -1043,6 +1052,32 @@ def main() -> None:
             return
 
         _run_single_download(paper_ids[0], None, args.save_base, restrict_dir=restrict_dir)
+        return
+
+    if args.command == "cite":
+        try:
+            nber_id = _parse_paper_id(args.paper_id)
+            if nber_id <= 0:
+                raise ValueError("paper ID must be positive")
+        except ValueError:
+            parser.error(f"invalid paper ID '{args.paper_id}'")
+        try:
+            cite_result = asyncio.run(get_paper_with_info_cache_result(nber_id, refresh=args.refresh))
+            citation = format_citation(cite_result.paper, args.citation_format)
+        except Exception as error:
+            print(f"Failed to generate citation for w{nber_id}: {error.__class__.__name__}.", file=sys.stderr)
+            raise SystemExit(1) from None
+        if args.stdout:
+            print(citation)
+            return
+        try:
+            copy_text(citation)
+        except ClipboardError as error:
+            print(citation)
+            print(f"Could not copy citation: {error} Citation printed to stdout.", file=sys.stderr)
+            raise SystemExit(1) from None
+        style = FORMAT_ALIASES.get(args.citation_format, args.citation_format)
+        print(f"Copied {FORMAT_LABELS[style]} citation for w{nber_id} to clipboard.", file=sys.stderr)
         return
 
     if args.command == "info":
