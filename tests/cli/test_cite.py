@@ -35,8 +35,9 @@ def test_all_formats_are_plain_text(paper, style):
 
 def test_author_rules(paper):
     paper.authors = ['Ludwig van Beethoven', 'Antràs, Pol']
-    assert format_citation(paper, 'apa').startswith('van Beethoven, L. & Antràs, P. (2026).')
+    assert format_citation(paper, 'apa').startswith('van Beethoven, L., & Antràs, P. (2026).')
     assert format_citation(paper, 'mla').startswith('van Beethoven, Ludwig, and Pol Antràs.')
+    assert format_citation(paper, 'chicago').startswith('van Beethoven, Ludwig, and Pol Antràs. 2026.')
     paper.authors += ['Davin Chor']
     assert ', et al.' in format_citation(paper, 'mla')
     assert 'VAN BEETHOVEN L, ANTRÀS P, CHOR D.' in format_citation(paper, 'gb')

@@ -1,3 +1,12 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2026 - Present Sepine Tam, Inc. All Rights Reserved
+#
+# @Author : Sepine Tam (谭淞)
+# @Email  : sepinetam@gmail.com
+# @File   : citation.py
+
 """Plain-text bibliography entries for NBER working papers."""
 
 from __future__ import annotations
@@ -6,6 +15,7 @@ import re
 from datetime import date
 
 from .core.models import NBER
+from .utils.formatters import paper_id_str
 
 FORMAT_ALIASES = {"bibtex": "bib", "gbt7714": "gb"}
 FORMAT_LABELS = {
@@ -44,11 +54,17 @@ def _inverted(author: str) -> str:
     return f"{family}, {_initials(given)}" if given else family
 
 
-def _join(authors: list[str], conjunction: str = "and", serial: bool = True) -> str:
+def _join(
+    authors: list[str],
+    conjunction: str = "and",
+    serial: bool = True,
+    two_author_comma: bool = False,
+) -> str:
     if len(authors) < 2:
         return authors[0] if authors else "Unknown author"
     if len(authors) == 2:
-        return f"{authors[0]} {conjunction} {authors[1]}"
+        separator = f", {conjunction} " if two_author_comma else f" {conjunction} "
+        return f"{authors[0]}{separator}{authors[1]}"
     return f"{', '.join(authors[:-1])}{',' if serial else ''} {conjunction} {authors[-1]}"
 
 
@@ -71,7 +87,7 @@ def format_citation(paper: NBER, style: str = "bib", *, accessed: date | None = 
     authors = [" ".join(author.split()) for author in paper.authors if author.strip()]
     year_match = re.match(r"\d{4}(?=$|[-/\s])", paper.date.strip())
     year = year_match.group() if year_match else "n.d."
-    code = f"{paper.series}{paper.paper_id:04d}"
+    code = paper_id_str(paper)
     url = paper.url or f"https://www.nber.org/papers/{code}"
     number = str(paper.paper_id)
     series = "NBER Working Paper" if paper.series == "w" else "NBER Historical Working Paper"
@@ -92,7 +108,7 @@ def format_citation(paper: NBER, style: str = "bib", *, accessed: date | None = 
         return f"@techreport{{nber{code},\n" + ",\n".join(lines) + "\n}"
     if style == "apa":
         # APA lists the first 19 and the last author for more than 20 authors.
-        author_line = _join(initials, "&") if len(initials) <= 20 else ", ".join(initials[:19]) + ", … " + initials[-1]
+        author_line = _join(initials, "&", two_author_comma=True) if len(initials) <= 20 else ", ".join(initials[:19]) + ", … " + initials[-1]
         return f"{author_line} ({year}). {title} ({series} No. {number}). {_INSTITUTION}. {url}"
     if style == "mla":
         family, given = _name(authors[0]) if authors else ("Unknown author", "")
@@ -110,7 +126,7 @@ def format_citation(paper: NBER, style: str = "bib", *, accessed: date | None = 
         for index, author in enumerate(authors):
             family, given = _name(author)
             names.append(f"{family}, {given}" if index == 0 and given else " ".join(filter(None, (given, family))))
-        return f"{_join(names).rstrip('.')}. {year}. “{end_title}” {series} {number}. {_INSTITUTION}. {url}."
+        return f"{_join(names, two_author_comma=True).rstrip('.')}. {year}. “{end_title}” {series} {number}. {_INSTITUTION}. {url}."
     gb_names = []
     for author in authors[:3]:
         family, given = _name(author)
