@@ -21,7 +21,7 @@ Start with the [User Manual](user-manual.md) for an end-to-end walkthrough or th
 | --- | --- | --- |
 | Desktop | Researchers | Visual paper feed, reading, citation, read-state, and local-tag workflow. |
 | MCP server | AI agents | Structured search, paper lookup, and constrained PDF download tools. |
-| CLI | AI agents and automation | Scriptable commands with human-readable and JSON output. |
+| CLI | AI agents and automation | Scriptable commands for search, metadata, citations, downloads, feeds, and local configuration, with human-readable and JSON output. |
 | Python API | Developers | Direct async access to fetch, download, feed, cache, and database helpers. |
 | Local HTTP API | Local integrations | Optional loopback service for feed, paper, read-state, and settings operations. |
 
@@ -73,7 +73,7 @@ Use the [Agent Guides](agents/index.md) for client-specific installation and ver
 - [Local HTTP API](http-api.md) and [Python API](python-api.md): integration contracts.
 - [System Architecture](architecture.md): runtime components, workflows, and trust boundaries.
 - [Development](development.md), [Testing](testing.md), and [Contributing](contributing.md): repository workflow and quality gates.
-- [Changelog](changelog.md): release history. The current repository version is **0.11.1**.
+- [Changelog](changelog.md): release history. The current repository version is **0.11.2**.
 
 ## Scope and Status
 

@@ -1,6 +1,6 @@
 # 系统架构
 
-NBER-CLI 0.10.0 是一个以 Desktop 为主要入口、共用 Python 核心与本地 SQLite 持久化的应用。Desktop 面向人类研究者；CLI 与 MCP 把论文核心流程提供给 AI Agent 和自动化；可选 HTTP API 是独立的本地集成，不属于 Desktop 运行时。
+NBER-CLI 是一个以 Desktop 为主要入口、共用 Python 核心与本地 SQLite 持久化的应用。Desktop 面向人类研究者；CLI 与 MCP 把论文核心流程提供给 AI Agent 和自动化；可选 HTTP API 是独立的本地集成，不属于 Desktop 运行时。
 
 功能范围、要求和证据追溯见[软件规格说明](software-specification.md)。
 
@@ -66,6 +66,8 @@ Desktop 的 Rust 层负责原生命令分发、配置安全、本地 Feed 读取
 - `db/info_cache.py` 协调元数据缓存查找、刷新与回退。
 - `db/db.py` 定义 schema-v3 共用表、迁移、已读状态、缓存和操作日志。
 - `config/config_store.py` 与 `config/config.schema.json` 管理 Python/CLI 配置。
+- `citation.py` 生成 BibTeX、APA、MLA、Harvard、Chicago 和 GB/T 7714 格式的纯文本参考文献条目。
+- `clipboard.py` 通过操作系统原生命令写入剪贴板，并在后端不可用时报告错误。
 
 ## Desktop 运行时
 
@@ -85,7 +87,7 @@ Worker 使用与 CLI 相同的 Python Feed 与元数据缓存函数。它不是�
 - MCP 返回适合 Agent 工具的 dictionary，不返回 CLI 文本。
 - 可选 HTTP API 对已处理结果使用统一 JSON envelope。
 - Desktop 通过 Tauri 命令接收序列化的 Rust 结构。
-- Desktop 引用格式化属于前端功能，与 CLI 输出格式化相互独立。
+- Desktop 在前端根据本地元数据生成引用。CLI 的 `cite` 命令通过 `src/nber_cli/citation.py` 生成引用，并通过 `src/nber_cli/clipboard.py` 写入剪贴板。
 
 ## 数据归属与并发
 
@@ -98,7 +100,7 @@ SQLite 为更新提供事务能力，但进行文件级备份或手动删除前�
 - 不需要项目账号或 API Key，应用代码不会把本地数据库上传到项目方基础设施。
 - CLI 默认启用当前目录字面检查；用户可以显式关闭。
 - MCP 始终规范化论文编号，并执行同类工作目录字面检查。
-- 0.10.0 的检查不会解析 `..` 片段或符号链接，因此不是安全沙箱。输入不可信时，应使用简单相对目标，并隔离进程工作目录。
+- 这些检查不会解析 `..` 片段或符号链接，因此不是安全沙箱。输入不可信时，应使用简单相对目标，并隔离进程工作目录。
 - MCP HTTP 传输没有内置认证，必须保持本地使用或增加外部认证。
 - 可选 HTTP API 默认绑定 loopback；Desktop 不使用也不启动它。
 - Desktop 不监听端口。刷新时由内置 worker 访问 NBER；手动检查更新时访问 GitHub。
@@ -120,4 +122,5 @@ SQLite 为更新提供事务能力，但进行文件级备份或手动删除前�
 | 缓存与数据库 | `src/nber_cli/db/info_cache.py`、`src/nber_cli/db/db.py` |
 | 配置 | `src/nber_cli/config/config_store.py`、`src/nber_cli/config/config.schema.json` |
 | 模型与格式化 | `src/nber_cli/core/models.py`、`src/nber_cli/utils/formatters.py` |
+| 引用格式化与剪贴板 | `src/nber_cli/citation.py`、`src/nber_cli/clipboard.py` |
 | 测试与发布校验 | `tests/`、`desktop/src/**/*.test.*`、`scripts/`、`.github/workflows/` |

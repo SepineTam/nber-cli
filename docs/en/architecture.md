@@ -1,6 +1,6 @@
 # System Architecture
 
-NBER-CLI 0.10.0 is a desktop-first application with a shared Python core and local SQLite persistence. Desktop is the human interface. CLI and MCP expose the core paper workflows to AI agents and automation. The optional HTTP API is a separate local integration and is not part of the Desktop runtime.
+NBER-CLI is a desktop-first application with a shared Python core and local SQLite persistence. Desktop is the human interface. CLI and MCP expose the core paper workflows to AI agents and automation. The optional HTTP API is a separate local integration and is not part of the Desktop runtime.
 
 For functional scope, requirements, and evidence traceability, see the [Software Specification](software-specification.md).
 
@@ -66,6 +66,8 @@ The Desktop's Rust layer owns native command dispatch, configuration safety, loc
 - `db/info_cache.py` coordinates metadata cache lookup, refresh, and fallback.
 - `db/db.py` defines schema-v3 shared tables, migrations, read state, cache, and operation logs.
 - `config/config_store.py` and `config/config.schema.json` manage Python/CLI configuration.
+- `citation.py` formats plain-text bibliography entries in BibTeX, APA, MLA, Harvard, Chicago, and GB/T 7714 styles.
+- `clipboard.py` writes text through native platform clipboard commands and reports an unavailable backend.
 
 ## Desktop Runtime
 
@@ -85,7 +87,7 @@ The worker uses the same Python Feed and metadata-cache functions as the CLI. It
 - MCP returns dictionaries shaped for agent tools rather than CLI text.
 - The optional HTTP API wraps handled outcomes in a shared JSON envelope.
 - Desktop receives serialized Rust structures through Tauri commands.
-- Desktop citation formatting is a frontend feature and is separate from CLI output formatting.
+- Desktop formats citations in its frontend from local metadata. The CLI `cite` command formats through `src/nber_cli/citation.py` and copies through `src/nber_cli/clipboard.py`.
 
 ## Data Ownership and Concurrency
 
@@ -98,7 +100,7 @@ SQLite provides transactional updates, but file-level backup or manual deletion 
 - No project account or API key is required, and application code does not upload the local database to project infrastructure.
 - CLI enables a lexical current-directory check by default; users may explicitly disable it.
 - MCP always normalizes paper IDs and applies the same kind of lexical working-directory check.
-- In 0.10.0 these checks do not resolve `..` segments or symbolic links and therefore are not a security sandbox. Use simple relative targets and isolate the process working directory when untrusted input is possible.
+- These checks do not resolve `..` segments or symbolic links and therefore are not a security sandbox. Use simple relative targets and isolate the process working directory when untrusted input is possible.
 - HTTP MCP transports have no built-in authentication and must remain local or sit behind external authentication.
 - The optional HTTP API binds to loopback by default; Desktop does not use or start it.
 - Desktop opens no listening port. Refresh uses the bundled worker to contact NBER; manual update check contacts GitHub.
@@ -120,4 +122,5 @@ SQLite provides transactional updates, but file-level backup or manual deletion 
 | Cache and database | `src/nber_cli/db/info_cache.py`, `src/nber_cli/db/db.py` |
 | Configuration | `src/nber_cli/config/config_store.py`, `src/nber_cli/config/config.schema.json` |
 | Models and formatting | `src/nber_cli/core/models.py`, `src/nber_cli/utils/formatters.py` |
+| Citation formatting and clipboard | `src/nber_cli/citation.py`, `src/nber_cli/clipboard.py` |
 | Tests and release validation | `tests/`, `desktop/src/**/*.test.*`, `scripts/`, `.github/workflows/` |

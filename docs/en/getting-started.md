@@ -26,6 +26,7 @@ These requirements do not apply to Desktop. For an AI agent or integration, the 
 uvx nber-cli --version
 uvx nber-cli search "Labor Economic"
 uvx nber-cli info w25000
+uvx nber-cli cite w1234
 uvx nber-cli download w34567
 ```
 
@@ -114,6 +115,25 @@ Use `--all` to include related fields and published-version information when NBE
 ```bash
 nber-cli info w25000 --all
 ```
+
+## Cite a Paper
+
+Copy a bibliography entry to the clipboard:
+
+```bash
+nber-cli cite w25000
+nber-cli cite w25000 -f apa
+```
+
+The default format is BibTeX. `-f` also accepts `mla`, `harvard`, `chicago`, and `gb`. The aliases `bibtex` and `gbt7714` are supported.
+
+Print the citation without using the clipboard, for example to build a bibliography file:
+
+```bash
+nber-cli cite w25000 --stdout > references.bib
+```
+
+Clipboard mode writes a confirmation to stderr only. If no clipboard backend is available, the citation is printed to stdout and the command exits with code 1.
 
 ## Follow New Papers with the Feed Cache
 

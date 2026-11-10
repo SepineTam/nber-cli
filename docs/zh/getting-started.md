@@ -26,6 +26,7 @@
 uvx nber-cli --version
 uvx nber-cli search "Labor Economic"
 uvx nber-cli info w25000
+uvx nber-cli cite w1234
 uvx nber-cli download w34567
 ```
 
@@ -114,6 +115,25 @@ nber-cli info 25000
 ```bash
 nber-cli info w25000 --all
 ```
+
+## 生成论文引用
+
+把参考文献条目复制到剪贴板：
+
+```bash
+nber-cli cite w25000
+nber-cli cite w25000 -f apa
+```
+
+默认格式是 BibTeX。`-f` 还支持 `mla`、`harvard`、`chicago` 和 `gb`，也可以使用别名 `bibtex` 与 `gbt7714`。
+
+如果要把引用打印出来并写入参考文献文件，可以运行下面这条命令。
+
+```bash
+nber-cli cite w25000 --stdout > references.bib
+```
+
+复制成功时，命令只在 stderr 输出确认信息。如果没有可用的剪贴板后端，引用会输出到 stdout，命令以退出码 1 结束。
 
 ## 用 Feed 缓存跟踪新论文
 

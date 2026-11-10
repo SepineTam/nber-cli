@@ -21,7 +21,7 @@ Desktop 可以同步 NBER 工作论文 Feed、搜索和筛选本地论文、显�
 | --- | --- | --- |
 | Desktop | 研究者 | 可视化论文 Feed、阅读、引用、已读状态和本地标签工作流。 |
 | MCP Server | AI Agent | 结构化搜索、论文查询和受目录约束的 PDF 下载工具。 |
-| CLI | AI Agent 与自动化任务 | 提供适合脚本的命令、可读文本和 JSON 输出。 |
+| CLI | AI Agent 与自动化任务 | 覆盖搜索、元数据、引用、下载、Feed 和本地配置等脚本命令，可输出可读文本或 JSON。 |
 | Python API | 开发者 | 直接调用异步获取、下载、Feed、缓存和数据库函数。 |
 | 本地 HTTP API | 本地集成程序 | 可选的 loopback 服务，提供 Feed、论文、已读状态和设置接口。 |
 
@@ -73,7 +73,7 @@ uvx nber-cli mcp-server
 - [本地 HTTP API](http-api.md)与 [Python API](python-api.md)：集成接口契约。
 - [系统架构](architecture.md)：运行组件、核心流程和信任边界。
 - [开发](development.md)、[测试](testing.md)和[贡献指南](contributing.md)：仓库工作流与质量门禁。
-- [更新日志](changelog.md)：版本历史。当前仓库版本为 **0.11.1**。
+- [更新日志](changelog.md)：版本历史。当前仓库版本为 **0.11.2**。
 
 ## 范围与状态
 
