@@ -49,6 +49,12 @@ uvx nber-cli search "gender wage gap" --format json \
   > citations.txt
 ```
 
+For one paper, use the built-in formatter instead of rebuilding the entry with `jq`. It supports six bibliography styles and handles author names and TeX escaping:
+
+```bash
+uvx nber-cli cite w25000 -f apa --stdout
+```
+
 ## Extract abstracts for topic modeling
 
 ```bash

@@ -1,6 +1,6 @@
 ---
 name: NBER-CLI
-description: "Use this skill when the user needs to search NBER working papers, inspect NBER paper metadata, download NBER paper PDFs, run NBER-CLI commands, or configure NBER-CLI as an MCP server."
+description: "Use this skill when the user needs to search NBER working papers, inspect NBER paper metadata, generate NBER paper citations, download NBER paper PDFs, run NBER-CLI commands, or configure NBER-CLI as an MCP server."
 ---
 
 # NBER-CLI
@@ -11,6 +11,7 @@ Use this skill when the user wants to use NBER-CLI for NBER working papers, incl
 
 - Searching NBER working papers by keyword, paper ID, author, abstract, or date range.
 - Inspecting metadata or abstracts for a known NBER paper ID.
+- Generating a bibliography entry in BibTeX, APA, MLA, Harvard, Chicago, or GB/T 7714 format.
 - Downloading one or more NBER PDF files to a chosen filesystem path.
 - Getting machine-readable JSON output for agent workflows.
 - Configuring NBER-CLI as an MCP server.
@@ -49,6 +50,16 @@ uvx nber-cli info w25000 --all
 uvx nber-cli info w25000 --format json
 ```
 
+Cite papers:
+
+```bash
+uvx nber-cli cite w25000
+uvx nber-cli cite w25000 -f apa
+uvx nber-cli cite w25000 --stdout > references.bib
+```
+
+`cite` writes a BibTeX entry to the clipboard by default. Use `-f` for `apa`, `mla`, `harvard`, `chicago`, or `gb`, and use `--stdout` when the result must be piped or the clipboard is unavailable. The command produces one bibliography entry, not an in-text citation.
+
 Download papers:
 
 ```bash
@@ -76,7 +87,7 @@ The `examples/` directory contains focused guides for advanced workflows:
 - [`examples/use-of-info.md`](examples/use-of-info.md): metadata lookup, full records, batch inspection, and ID validation.
 - [`examples/use-of-download.md`](examples/use-of-download.md): single and batch downloads, save paths, restricted access handling, and feed-to-download integration.
 - [`examples/use-of-mcp-server.md`](examples/use-of-mcp-server.md): stdio and HTTP MCP server setup, client configuration, and security notes.
-- [`examples/use-of-json-pipeline.md`](examples/use-of-json-pipeline.md): stable JSON shapes, jq recipes, citation extraction, and append-only JSON Lines logs.
+- [`examples/use-of-json-pipeline.md`](examples/use-of-json-pipeline.md): stable JSON shapes, jq recipes, citation extraction and built-in citation formatting, and append-only JSON Lines logs.
 - [`examples/use-of-db.md`](examples/use-of-db.md): database initialization, custom paths or `sqlite:///...` URLs, migration, direct SQLite queries, and backup.
 - [`examples/use-of-automation.md`](examples/use-of-automation.md): weekly digest scripts, cron recipes, systemd timers, and topic alerts.
 - [`examples/use-of-error-handling.md`](examples/use-of-error-handling.md): interpreting 403, 404, and timeouts, plus robust shell patterns.
