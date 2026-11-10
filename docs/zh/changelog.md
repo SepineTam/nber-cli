@@ -4,6 +4,17 @@
 
 本页是仓库根 `CHANGELOG.md` 的中文镜像，英文镜像在 `docs/en/changelog.md`。每次发布提交都会同步更新三份内容。
 
+## 0.12.0 - 2026-11-10
+
+### Added
+
+- 新增 `nber-cli cite`，用于把单篇 NBER 工作论文格式化为纯文本参考文献条目并复制到系统剪贴板。默认输出 BibTeX，也可通过 `--format` 或 `-f` 选择 APA 7th、MLA 9th、Harvard、Chicago 18th 和 GB/T 7714。`--stdout` 只打印条目不复制，`--refresh` 会先从 NBER 刷新元数据。
+- 新增 macOS、Windows 和 Linux 桌面环境的原生剪贴板支持。没有可用剪贴板后端时，引用会打印到 stdout，命令以状态码 1 结束。
+
+### Documentation
+
+- 在 README、CLI 参考、快速开始、架构页、Desktop 页和 NBER-CLI 技能中补充 `cite` 命令说明。
+
 ## 0.11.2 - 2026-10-04
 
 ### Fixed

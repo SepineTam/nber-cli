@@ -4,6 +4,17 @@ All notable changes to this project will be documented here.
 
 This page mirrors the canonical `CHANGELOG.md` at the repository root. The Chinese mirror at `docs/zh/changelog.md` carries the same content. Any release commit updates all three together.
 
+## 0.12.0 - 2026-11-10
+
+### Added
+
+- Added `nber-cli cite` to format a single NBER working paper as a plain-text bibliography entry and copy it to the system clipboard. BibTeX is the default, and APA 7th, MLA 9th, Harvard, Chicago 18th, and GB/T 7714 are available through `--format` or `-f`. `--stdout` prints the entry without copying, and `--refresh` refreshes metadata from NBER first.
+- Added native clipboard support for macOS, Windows, and Linux desktop sessions. If no clipboard backend is available, the citation is printed to stdout and the command exits with status 1.
+
+### Documentation
+
+- Documented the `cite` command in the README files, CLI reference, getting-started guide, architecture page, Desktop page, and NBER-CLI skill.
+
 ## 0.11.2 - 2026-10-04
 
 ### Fixed
